@@ -1,1 +1,178 @@
 
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>機械検査3級 練習問題</title>
+<style>
+body {
+  font-family: sans-serif;
+  background: #f1f5f9;
+  color: #1e293b;
+  margin: 0;
+  padding: 20px;
+}
+main {
+  max-width: 620px;
+  margin: 20px auto;
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px #0001;
+}
+h1 { color: #155e75; font-size: 24px; }
+button {
+  padding: 12px 18px;
+  margin: 6px 4px 6px 0;
+  border: 0;
+  border-radius: 8px;
+  background: #0e7490;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+button:hover { background: #155e75; }
+#result { font-weight: bold; margin-top: 18px; }
+.small { color: #64748b; font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>機械検査技能検定 3級</h1>
+  <p>練習問題にチャレンジしよう！</p>
+  <p class="small">試作版・学習用のオリジナル問題</p>
+  <hr>
+  <p id="progress"></p>
+  <h3 id="question"></h3>
+  <div id="choices"></div>
+  <p id="result"></p>
+  <p id="explanation"></p>
+  <button id="next" hidden onclick="nextQuestion()">次の問題へ →</button>
+  <p id="score"></p>
+</main>
+<script>
+const questions = [
+  {
+    q: "ノギスで外側の寸法を測定するとき、適切な使い方はどれ？",
+    choices: [
+      "測定物を斜めに挟む",
+      "測定面を測定物に正しく当てる",
+      "目盛りを読まず感覚で判断する",
+      "測定物を強く押しつぶす"
+    ],
+    answer: 1,
+    explanation: "測定面を測定物に正しく当て、傾きや過度な測定力に注意して測定します。"
+  },
+  {
+    q: "測定器を使用する前に行うこととして適切なのはどれ？",
+    choices: [
+      "落として動作を確認する",
+      "目盛りを削って見やすくする",
+      "外観やゼロ点などの状態を確認する",
+      "必ず最大測定力をかける"
+    ],
+    answer: 2,
+    explanation: "測定器の外観や測定面、ゼロ点などを確認し、異常があれば使用を避けます。"
+  },
+  {
+    q: "同じ条件で測定を繰り返す主な目的はどれ？",
+    choices: [
+      "測定値のばらつきを把握する",
+      "測定器を早く摩耗させる",
+      "寸法を必ず大きくする",
+      "検査記録を省略する"
+    ],
+    answer: 0,
+    explanation: "繰り返し測定することで、測定値のばらつきなどを確認できます。"
+  },
+  {
+    q: "測定器の取り扱いとして適切なのはどれ？",
+    choices: [
+      "使用後は汚れを放置する",
+      "落下しやすい場所に置く",
+      "用途に関係なく何でも測る",
+      "使用後は汚れを拭き、適切に保管する"
+    ],
+    answer: 3,
+    explanation: "測定器の精度を保つため、使用後は清掃し、適切な方法で保管します。"
+  },
+  {
+    q: "図面に示された寸法を検査する際、最初に確認するものとして適切なのはどれ？",
+    choices: [
+      "担当者の好み",
+      "図面の寸法と公差",
+      "製品の色だけ",
+      "製品の重さだけ"
+    ],
+    answer: 1,
+    explanation: "図面に記載された寸法や公差など、判定基準を確認して検査します。"
+  }
+];
+
+let current = 0;
+let correct = 0;
+let answered = false;
+
+function showQuestion() {
+  answered = false;
+  const q = questions[current];
+  document.getElementById("progress").textContent =
+    `第 ${current + 1} 問 / 全 ${questions.length} 問`;
+  document.getElementById("question").textContent = q.q;
+  document.getElementById("choices").innerHTML = "";
+  document.getElementById("result").textContent = "";
+  document.getElementById("explanation").textContent = "";
+  document.getElementById("score").textContent = "";
+  document.getElementById("next").hidden = true;
+
+  q.choices.forEach((choice, index) => {
+    const button = document.createElement("button");
+    button.textContent = `${["①","②","③","④"][index]} ${choice}`;
+    button.style.display = "block";
+    button.style.width = "100%";
+    button.style.textAlign = "left";
+    button.onclick = () => checkAnswer(index);
+    document.getElementById("choices").appendChild(button);
+  });
+}
+
+function checkAnswer(index) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const isCorrect = index === q.answer;
+  if (isCorrect) correct++;
+  document.getElementById("result").textContent =
+    isCorrect ? "正解！ 🎉" : "不正解。正解は " +
+    ["①","②","③","④"][q.answer] + " です。";
+  document.getElementById("explanation").textContent =
+    "解説：" + q.explanation;
+  document.getElementById("next").hidden = false;
+  document.getElementById("score").textContent =
+    `現在の正解数：${correct} / ${current + 1}`;
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) {
+    document.getElementById("progress").textContent = "練習終了！";
+    document.getElementById("question").textContent =
+      `結果：${correct} / ${questions.length} 問正解`;
+    document.getElementById("choices").innerHTML = "";
+    document.getElementById("result").textContent =
+      "お疲れさまでした！";
+    document.getElementById("explanation").textContent =
+      "これは試作版です。問題と解説は今後追加・検証していきます。";
+    document.getElementById("next").hidden = true;
+    document.getElementById("score").textContent = "";
+    return;
+  }
+  showQuestion();
+}
+
+showQuestion();
+</script>
+</body>
+</html>
+
